@@ -11,3 +11,6 @@
 - 进到目录，执行 `npm install` 安装依赖。
 - 调试运行，执行 `npm run docs:dev`
 - build 文档，执行 `npm run docs:build`
+  
+### 问题反馈
+- 欢迎提交 [issue](https://github.com/lucas-hliu/lucas-hliu.github.io/issues)，或者直接提 [pr](https://github.com/lucas-hliu/lucas-hliu.github.io/pulls)。
