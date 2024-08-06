@@ -5,7 +5,9 @@ category:
   - 数据结构
 tag:
   - c++
-  - 数据结构
+  - 线性结构
+  - 数组
+  - 链表
 editLink: false
 ---
 

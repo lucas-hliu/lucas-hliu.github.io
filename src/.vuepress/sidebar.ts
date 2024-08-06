@@ -24,5 +24,12 @@ export default sidebar({
       link: "guide/",
       children: "structure",
     },
+    {
+      text: "副业搞钱",
+      icon: "sack-dollar",
+      prefix: "sideline/",
+      link: "sideline/",
+      children: "structure",
+    },
   ],
 });
