@@ -8,8 +8,6 @@ editLink: false
 ---
 
 
-本站主要内容：
-
 ### c++ 相关的面/笔试题
 
 - [c++面试题](/interview/c++basic)
@@ -20,3 +18,43 @@ editLink: false
 - [数组与链表](/algo/array)
 
   
+::: tabs
+
+@tab 标题 1
+
+<!-- tab 1 内容 -->
+内容1
+
+@tab 标题 2
+
+<!-- tab 2 内容 -->
+内容2
+
+@tab:active 标题 3
+
+<!-- tab 3 将会被默认激活 -->
+
+<!-- tab 3 内容 -->
+内容3
+
+:::
+
+``` mermaid
+---
+title: Flowchart
+---
+flowchart TB
+    c1-->a2
+    subgraph one
+    a1-->a2
+    end
+    subgraph two
+    b1-->b2
+    end
+    subgraph three
+    c1-->c2
+    end
+    one --> two
+    three --> two
+    two --> c2
+```

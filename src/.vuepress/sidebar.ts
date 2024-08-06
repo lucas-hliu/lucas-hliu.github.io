@@ -11,9 +11,17 @@ export default sidebar({
       children: "structure",
     },
     {
-      text: "数据结构与算法",
+      text: "数据结构",
       icon: "book",
       prefix: "algo/",
+      link: "algo/",
+      children: "structure",
+    },
+    {
+      text: "基础教程",
+      icon: "cubes",
+      prefix: "guide/",
+      link: "guide/",
       children: "structure",
     },
   ],

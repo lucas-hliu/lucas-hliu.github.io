@@ -9,7 +9,7 @@ tag:
 ---
 
 ## 线程创建 
-```
+``` cpp
 // thread example
 #include <iostream>       // std::cout
 #include <thread>         // std::thread

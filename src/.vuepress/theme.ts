@@ -9,6 +9,7 @@ export default hopeTheme({
   author: {
     name: "lucas-hliu",
     url: "https://github.com/lucas-hliu",
+    email: "liuheng2015@gmail.com",
   },
 
   iconAssets: "fontawesome-with-brands",
@@ -110,7 +111,7 @@ export default hopeTheme({
       // mathjax: true,
 
       // 在启用之前安装 mermaid
-      // mermaid: true,
+      mermaid: true,
 
       // playground: {
       //   presets: ["ts", "vue"],
