@@ -5,5 +5,6 @@ export default navbar([
   "/interview/",
   "/algo/",
   "/guide/",
+  "/design/",
   "/sideline/"
 ]);

@@ -25,6 +25,13 @@ export default sidebar({
       children: "structure",
     },
     {
+      text: "架构设计",
+      icon: "network-wired",
+      prefix: "design/",
+      link: "design/",
+      children: "structure",
+    },
+    {
       text: "副业搞钱",
       icon: "sack-dollar",
       prefix: "sideline/",
