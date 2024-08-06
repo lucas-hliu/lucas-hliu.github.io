@@ -18,10 +18,10 @@ export default sidebar({
       children: "structure",
     },
     {
-      text: "基础教程",
-      icon: "cubes",
-      prefix: "guide/",
-      link: "guide/",
+      text: "架构设计",
+      icon: "network-wired",
+      prefix: "design/",
+      link: "design/",
       children: "structure",
     },
     {
@@ -32,11 +32,9 @@ export default sidebar({
       children: "structure",
     },
     {
-      text: "副业搞钱",
-      icon: "sack-dollar",
-      prefix: "sideline/",
-      link: "sideline/",
-      children: "structure",
+      text: "书籍推荐",
+      icon: "book",
+      link: "/books/share_books",
     },
   ],
 });
