@@ -60,9 +60,7 @@ editLink: false
 
 哈希表有三种常用的遍历方式：遍历键值对、遍历键和遍历值。示例代码如下：
 
-
-
-    ```cpp title="hash_map.cpp"
+```cpp 
     /* 遍历哈希表 */
     // 遍历键值对 key->value
     for (auto kv: map) {
@@ -72,13 +70,13 @@ editLink: false
     for (auto iter = map.begin(); iter != map.end(); iter++) {
         cout << iter->first << "->" << iter->second << endl;
     }
-    ```
+```
 
 ## 哈希表简单实现
 
-我们先考虑最简单的情况，**仅用一个数组来实现哈希表**。在哈希表中，我们将数组中的每个空位称为<u>桶（bucket）</u>，每个桶可存储一个键值对。因此，查询操作就是找到 `key` 对应的桶，并在桶中获取 `value` 。
+我们先考虑最简单的情况，**仅用一个数组来实现哈希表**。在哈希表中，我们将数组中的每个空位称为桶（bucket），每个桶可存储一个键值对。因此，查询操作就是找到 `key` 对应的桶，并在桶中获取 `value` 。
 
-那么，如何基于 `key` 定位对应的桶呢？这是通过<u>哈希函数（hash function）</u>实现的。哈希函数的作用是将一个较大的输入空间映射到一个较小的输出空间。在哈希表中，输入空间是所有 `key` ，输出空间是所有桶（数组索引）。换句话说，输入一个 `key` ，**我们可以通过哈希函数得到该 `key` 对应的键值对在数组中的存储位置**。
+那么，如何基于 `key` 定位对应的桶呢？这是通过哈希函数（hash function）实现的。哈希函数的作用是将一个较大的输入空间映射到一个较小的输出空间。在哈希表中，输入空间是所有 `key` ，输出空间是所有桶（数组索引）。换句话说，输入一个 `key` ，**我们可以通过哈希函数得到该 `key` 对应的键值对在数组中的存储位置**。
 
 输入一个 `key` ，哈希函数的计算过程分为以下两步。
 
@@ -97,8 +95,108 @@ index = hash(key) % capacity
 
 以下代码实现了一个简单哈希表。其中，我们将 `key` 和 `value` 封装成一个类 `Pair` ，以表示键值对。
 
-```src
-[file]{array_hash_map}-[class]{array_hash_map}-[func]{}
+```cpp
+/* 键值对 */
+struct Pair {
+  public:
+    int key;
+    string val;
+    Pair(int key, string val) {
+        this->key = key;
+        this->val = val;
+    }
+};
+
+/* 基于数组实现的哈希表 */
+class ArrayHashMap {
+  private:
+    vector<Pair *> buckets;
+
+  public:
+    ArrayHashMap() {
+        // 初始化数组，包含 100 个桶
+        buckets = vector<Pair *>(100);
+    }
+
+    ~ArrayHashMap() {
+        // 释放内存
+        for (const auto &bucket : buckets) {
+            delete bucket;
+        }
+        buckets.clear();
+    }
+
+    /* 哈希函数 */
+    int hashFunc(int key) {
+        int index = key % 100;
+        return index;
+    }
+
+    /* 查询操作 */
+    string get(int key) {
+        int index = hashFunc(key);
+        Pair *pair = buckets[index];
+        if (pair == nullptr)
+            return "";
+        return pair->val;
+    }
+
+    /* 添加操作 */
+    void put(int key, string val) {
+        Pair *pair = new Pair(key, val);
+        int index = hashFunc(key);
+        buckets[index] = pair;
+    }
+
+    /* 删除操作 */
+    void remove(int key) {
+        int index = hashFunc(key);
+        // 释放内存并置为 nullptr
+        delete buckets[index];
+        buckets[index] = nullptr;
+    }
+
+    /* 获取所有键值对 */
+    vector<Pair *> pairSet() {
+        vector<Pair *> pairSet;
+        for (Pair *pair : buckets) {
+            if (pair != nullptr) {
+                pairSet.push_back(pair);
+            }
+        }
+        return pairSet;
+    }
+
+    /* 获取所有键 */
+    vector<int> keySet() {
+        vector<int> keySet;
+        for (Pair *pair : buckets) {
+            if (pair != nullptr) {
+                keySet.push_back(pair->key);
+            }
+        }
+        return keySet;
+    }
+
+    /* 获取所有值 */
+    vector<string> valueSet() {
+        vector<string> valueSet;
+        for (Pair *pair : buckets) {
+            if (pair != nullptr) {
+                valueSet.push_back(pair->val);
+            }
+        }
+        return valueSet;
+    }
+
+    /* 打印哈希表 */
+    void print() {
+        for (Pair *kv : pairSet()) {
+            cout << kv->key << " -> " << kv->val << endl;
+        }
+    }
+};
+
 ```
 
 ## 哈希冲突与扩容
@@ -112,7 +210,7 @@ index = hash(key) % capacity
 20336 % 100 = 36
 ```
 
-如下图所示，两个学号指向了同一个姓名，这显然是不对的。我们将这种多个输入对应同一输出的情况称为<u>哈希冲突（hash collision）</u>。
+如下图所示，两个学号指向了同一个姓名，这显然是不对的。我们将这种多个输入对应同一输出的情况称为哈希冲突（hash collision）。
 
 ![哈希冲突示例](hash_map.assets/hash_collision.png)
 
@@ -124,12 +222,11 @@ index = hash(key) % capacity
 
 类似于数组扩容，哈希表扩容需将所有键值对从原哈希表迁移至新哈希表，非常耗时；并且由于哈希表容量 `capacity` 改变，我们需要通过哈希函数来重新计算所有键值对的存储位置，这进一步增加了扩容过程的计算开销。为此，编程语言通常会预留足够大的哈希表容量，防止频繁扩容。
 
-<u>负载因子（load factor）</u>是哈希表的一个重要概念，其定义为哈希表的元素数量除以桶数量，用于衡量哈希冲突的严重程度，**也常作为哈希表扩容的触发条件**。例如在 Java 中，当负载因子超过 $0.75$ 时，系统会将哈希表扩容至原先的 $2$ 倍。
-
+负载因子（load factor）是哈希表的一个重要概念，其定义为哈希表的元素数量除以桶数量，用于衡量哈希冲突的严重程度，**也常作为哈希表扩容的触发条件**。例如在 Java 中，当负载因子超过 $0.75$ 时，系统会将哈希表扩容至原先的 $2$ 倍。
 
 ## 哈希冲突
 
-上一节提到，**通常情况下哈希函数的输入空间远大于输出空间**，因此理论上哈希冲突是不可避免的。比如，输入空间为全体整数，输出空间为数组容量大小，则必然有多个整数映射至同一桶索引。
+**通常情况下哈希函数的输入空间远大于输出空间**，因此理论上哈希冲突是不可避免的。比如，输入空间为全体整数，输出空间为数组容量大小，则必然有多个整数映射至同一桶索引。
 
 哈希冲突会导致查询结果错误，严重影响哈希表的可用性。为了解决该问题，每当遇到哈希冲突时，我们就进行哈希表扩容，直至冲突消失为止。此方法简单粗暴且有效，但效率太低，因为哈希表扩容需要进行大量的数据搬运与哈希值计算。为了提升效率，我们可以采用以下策略。
 
@@ -140,7 +237,7 @@ index = hash(key) % capacity
 
 ### 链式地址
 
-在原始哈希表中，每个桶仅能存储一个键值对。<u>链式地址（separate chaining）</u>将单个元素转换为链表，将键值对作为链表节点，将所有发生冲突的键值对都存储在同一链表中。下图展示了一个链式地址哈希表的例子。
+在原始哈希表中，每个桶仅能存储一个键值对。链式地址（separate chaining）将单个元素转换为链表，将键值对作为链表节点，将所有发生冲突的键值对都存储在同一链表中。下图展示了一个链式地址哈希表的例子。
 
 ![链式地址哈希表](hash_collision.assets/hash_table_chaining.png)
 
@@ -160,15 +257,128 @@ index = hash(key) % capacity
 - 使用列表（动态数组）代替链表，从而简化代码。在这种设定下，哈希表（数组）包含多个桶，每个桶都是一个列表。
 - 以下实现包含哈希表扩容方法。当负载因子超过 $\frac{2}{3}$ 时，我们将哈希表扩容至原先的 $2$ 倍。
 
-```src
-[file]{hash_map_chaining}-[class]{hash_map_chaining}-[func]{}
+```cpp
+/* 链式地址哈希表 */
+class HashMapChaining {
+  private:
+    int size;                       // 键值对数量
+    int capacity;                   // 哈希表容量
+    double loadThres;               // 触发扩容的负载因子阈值
+    int extendRatio;                // 扩容倍数
+    vector<vector<Pair *>> buckets; // 桶数组
+
+  public:
+    /* 构造方法 */
+    HashMapChaining() : size(0), capacity(4), loadThres(2.0 / 3.0), extendRatio(2) {
+        buckets.resize(capacity);
+    }
+
+    /* 析构方法 */
+    ~HashMapChaining() {
+        for (auto &bucket : buckets) {
+            for (Pair *pair : bucket) {
+                // 释放内存
+                delete pair;
+            }
+        }
+    }
+
+    /* 哈希函数 */
+    int hashFunc(int key) {
+        return key % capacity;
+    }
+
+    /* 负载因子 */
+    double loadFactor() {
+        return (double)size / (double)capacity;
+    }
+
+    /* 查询操作 */
+    string get(int key) {
+        int index = hashFunc(key);
+        // 遍历桶，若找到 key ，则返回对应 val
+        for (Pair *pair : buckets[index]) {
+            if (pair->key == key) {
+                return pair->val;
+            }
+        }
+        // 若未找到 key ，则返回空字符串
+        return "";
+    }
+
+    /* 添加操作 */
+    void put(int key, string val) {
+        // 当负载因子超过阈值时，执行扩容
+        if (loadFactor() > loadThres) {
+            extend();
+        }
+        int index = hashFunc(key);
+        // 遍历桶，若遇到指定 key ，则更新对应 val 并返回
+        for (Pair *pair : buckets[index]) {
+            if (pair->key == key) {
+                pair->val = val;
+                return;
+            }
+        }
+        // 若无该 key ，则将键值对添加至尾部
+        buckets[index].push_back(new Pair(key, val));
+        size++;
+    }
+
+    /* 删除操作 */
+    void remove(int key) {
+        int index = hashFunc(key);
+        auto &bucket = buckets[index];
+        // 遍历桶，从中删除键值对
+        for (int i = 0; i < bucket.size(); i++) {
+            if (bucket[i]->key == key) {
+                Pair *tmp = bucket[i];
+                bucket.erase(bucket.begin() + i); // 从中删除键值对
+                delete tmp;                       // 释放内存
+                size--;
+                return;
+            }
+        }
+    }
+
+    /* 扩容哈希表 */
+    void extend() {
+        // 暂存原哈希表
+        vector<vector<Pair *>> bucketsTmp = buckets;
+        // 初始化扩容后的新哈希表
+        capacity *= extendRatio;
+        buckets.clear();
+        buckets.resize(capacity);
+        size = 0;
+        // 将键值对从原哈希表搬运至新哈希表
+        for (auto &bucket : bucketsTmp) {
+            for (Pair *pair : bucket) {
+                put(pair->key, pair->val);
+                // 释放内存
+                delete pair;
+            }
+        }
+    }
+
+    /* 打印哈希表 */
+    void print() {
+        for (auto &bucket : buckets) {
+            cout << "[";
+            for (Pair *pair : bucket) {
+                cout << pair->key << " -> " << pair->val << ", ";
+            }
+            cout << "]\n";
+        }
+    }
+};
+
 ```
 
 值得注意的是，当链表很长时，查询效率 $O(n)$ 很差。**此时可以将链表转换为“AVL 树”或“红黑树”**，从而将查询操作的时间复杂度优化至 $O(\log n)$ 。
 
 ### 开放寻址
 
-<u>开放寻址（open addressing）</u>不引入额外的数据结构，而是通过“多次探测”来处理哈希冲突，探测方式主要包括线性探测、平方探测和多次哈希等。
+开放寻址（open addressing）不引入额外的数据结构，而是通过“多次探测”来处理哈希冲突，探测方式主要包括线性探测、平方探测和多次哈希等。
 
 下面以线性探测为例，介绍开放寻址哈希表的工作机制。
 
@@ -197,8 +407,143 @@ index = hash(key) % capacity
 
 以下代码实现了一个包含懒删除的开放寻址（线性探测）哈希表。为了更加充分地使用哈希表的空间，我们将哈希表看作一个“环形数组”，当越过数组尾部时，回到头部继续遍历。
 
-```src
-[file]{hash_map_open_addressing}-[class]{hash_map_open_addressing}-[func]{}
+```cpp
+
+/* 开放寻址哈希表 */
+class HashMapOpenAddressing {
+  private:
+    int size;                             // 键值对数量
+    int capacity = 4;                     // 哈希表容量
+    const double loadThres = 2.0 / 3.0;     // 触发扩容的负载因子阈值
+    const int extendRatio = 2;            // 扩容倍数
+    vector<Pair *> buckets;               // 桶数组
+    Pair *TOMBSTONE = new Pair(-1, "-1"); // 删除标记
+
+  public:
+    /* 构造方法 */
+    HashMapOpenAddressing() : size(0), buckets(capacity, nullptr) {
+    }
+
+    /* 析构方法 */
+    ~HashMapOpenAddressing() {
+        for (Pair *pair : buckets) {
+            if (pair != nullptr && pair != TOMBSTONE) {
+                delete pair;
+            }
+        }
+        delete TOMBSTONE;
+    }
+
+    /* 哈希函数 */
+    int hashFunc(int key) {
+        return key % capacity;
+    }
+
+    /* 负载因子 */
+    double loadFactor() {
+        return (double)size / capacity;
+    }
+
+    /* 搜索 key 对应的桶索引 */
+    int findBucket(int key) {
+        int index = hashFunc(key);
+        int firstTombstone = -1;
+        // 线性探测，当遇到空桶时跳出
+        while (buckets[index] != nullptr) {
+            // 若遇到 key ，返回对应的桶索引
+            if (buckets[index]->key == key) {
+                // 若之前遇到了删除标记，则将键值对移动至该索引处
+                if (firstTombstone != -1) {
+                    buckets[firstTombstone] = buckets[index];
+                    buckets[index] = TOMBSTONE;
+                    return firstTombstone; // 返回移动后的桶索引
+                }
+                return index; // 返回桶索引
+            }
+            // 记录遇到的首个删除标记
+            if (firstTombstone == -1 && buckets[index] == TOMBSTONE) {
+                firstTombstone = index;
+            }
+            // 计算桶索引，越过尾部则返回头部
+            index = (index + 1) % capacity;
+        }
+        // 若 key 不存在，则返回添加点的索引
+        return firstTombstone == -1 ? index : firstTombstone;
+    }
+
+    /* 查询操作 */
+    string get(int key) {
+        // 搜索 key 对应的桶索引
+        int index = findBucket(key);
+        // 若找到键值对，则返回对应 val
+        if (buckets[index] != nullptr && buckets[index] != TOMBSTONE) {
+            return buckets[index]->val;
+        }
+        // 若键值对不存在，则返回空字符串
+        return "";
+    }
+
+    /* 添加操作 */
+    void put(int key, string val) {
+        // 当负载因子超过阈值时，执行扩容
+        if (loadFactor() > loadThres) {
+            extend();
+        }
+        // 搜索 key 对应的桶索引
+        int index = findBucket(key);
+        // 若找到键值对，则覆盖 val 并返回
+        if (buckets[index] != nullptr && buckets[index] != TOMBSTONE) {
+            buckets[index]->val = val;
+            return;
+        }
+        // 若键值对不存在，则添加该键值对
+        buckets[index] = new Pair(key, val);
+        size++;
+    }
+
+    /* 删除操作 */
+    void remove(int key) {
+        // 搜索 key 对应的桶索引
+        int index = findBucket(key);
+        // 若找到键值对，则用删除标记覆盖它
+        if (buckets[index] != nullptr && buckets[index] != TOMBSTONE) {
+            delete buckets[index];
+            buckets[index] = TOMBSTONE;
+            size--;
+        }
+    }
+
+    /* 扩容哈希表 */
+    void extend() {
+        // 暂存原哈希表
+        vector<Pair *> bucketsTmp = buckets;
+        // 初始化扩容后的新哈希表
+        capacity *= extendRatio;
+        buckets = vector<Pair *>(capacity, nullptr);
+        size = 0;
+        // 将键值对从原哈希表搬运至新哈希表
+        for (Pair *pair : bucketsTmp) {
+            if (pair != nullptr && pair != TOMBSTONE) {
+                put(pair->key, pair->val);
+                delete pair;
+            }
+        }
+    }
+
+    /* 打印哈希表 */
+    void print() {
+        for (Pair *pair : buckets) {
+            if (pair == nullptr) {
+                cout << "nullptr" << endl;
+            } else if (pair == TOMBSTONE) {
+                cout << "TOMBSTONE" << endl;
+            } else {
+                cout << pair->key << " -> " << pair->val << endl;
+            }
+        }
+    }
+};
+
 ```
 
 #### 平方探测
@@ -224,9 +569,9 @@ index = hash(key) % capacity
 
 与线性探测相比，多次哈希方法不易产生聚集，但多个哈希函数会带来额外的计算量。
 
-!!! tip
-
-    请注意，开放寻址（线性探测、平方探测和多次哈希）哈希表都存在“不能直接删除元素”的问题。
+::: info
+请注意，开放寻址（线性探测、平方探测和多次哈希）哈希表都存在“不能直接删除元素”的问题。
+:::
 
 ## 编程语言的选择
 
@@ -285,8 +630,16 @@ index = hash(key) % capacity
 - **异或哈希**：将输入数据的每个元素通过异或操作累积到一个哈希值中。
 - **旋转哈希**：将每个字符的 ASCII 码累积到一个哈希值中，每次累积之前都会对哈希值进行旋转操作。
 
-```src
-[file]{simple_hash}-[class]{}-[func]{rot_hash}
+```cpp
+/* 旋转哈希 */
+int rotHash(string key) {
+    long long hash = 0;
+    const int MODULUS = 1000000007;
+    for (unsigned char c : key) {
+        hash = ((hash << 4) ^ (hash >> 28) ^ (int)c) % MODULUS;
+    }
+    return (int)hash;
+}
 ```
 
 观察发现，每种哈希算法的最后一步都是对大质数 $1000000007$ 取模，以确保哈希值在合适的范围内。值得思考的是，为什么要强调对质数取模，或者说对合数取模的弊端是什么？这是一个有趣的问题。
@@ -347,13 +700,12 @@ $$
 - 元组的哈希值是对其中每一个元素进行哈希，然后将这些哈希值组合起来，得到单一的哈希值。
 - 对象的哈希值基于其内存地址生成。通过重写对象的哈希方法，可实现基于内容生成哈希值。
 
-!!! tip
+::: info
 
-    请注意，不同编程语言的内置哈希值计算函数的定义和方法不同。
+请注意，不同编程语言的内置哈希值计算函数的定义和方法不同。
+:::
 
-
-
-    ```cpp 
+```cpp 
     int num = 3;
     size_t hashNum = hash<int>()(num);
     // 整数 3 的哈希值为 3
@@ -372,7 +724,7 @@ $$
 
     // 在 C++ 中，内置 std:hash() 仅提供基本数据类型的哈希值计算
     // 数组、对象的哈希值计算需要自行实现
-    ```
+```
 在许多编程语言中，**只有不可变对象才可作为哈希表的 `key`** 。假如我们将列表（动态数组）作为 `key` ，当列表的内容发生变化时，它的哈希值也随之改变，我们就无法在哈希表中查询到原先的 `value` 了。
 
 虽然自定义对象（比如链表节点）的成员变量是可变的，但它是可哈希的。**这是因为对象的哈希值通常是基于内存地址生成的**，即使对象的内容发生了变化，但它的内存地址不变，哈希值仍然是不变的。
