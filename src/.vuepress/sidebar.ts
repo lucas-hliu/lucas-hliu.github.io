@@ -11,7 +11,8 @@ export default sidebar({
       children: [
         "1 c++basic.md",
         "2 process.md",
-        "3 thread.md"
+        "3 thread.md",
+        "4 c++11.md",
       ],
     },
     {
