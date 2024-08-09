@@ -1,5 +1,5 @@
 ---
-title: 树
+title: 二叉树
 order: 2
 category:
   - 数据结构
