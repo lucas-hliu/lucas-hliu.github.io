@@ -24,6 +24,7 @@ export default sidebar({
         "1 array_and_list.md",
         "2 queue_and_stack.md",
         "3 hash_map.md",
+        "4 tree.md",
       ],
     },
     {
